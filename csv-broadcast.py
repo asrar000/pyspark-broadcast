@@ -15,7 +15,13 @@ def main():
     df = spark.read.csv(csv_path, header=True, inferSchema=True)
 
     # Step 2: Collect rows into dictionary (broadcastable form)
-    people_dict = {i: row.asDict() for i, row in enumerate(df.collect())}
+    # Collect all rows from the DataFrame
+    rows = df.collect()
+
+    # Convert each row to a dictionary and assign a unique index
+    people_dict = {}
+    for i, row in enumerate(rows):
+        people_dict[i] = row.asDict()
 
     # Step 3: Broadcast dictionary
     broadcast_var = sc.broadcast(people_dict)
